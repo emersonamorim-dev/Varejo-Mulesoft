@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <http:listener-config name="Listener4_config" doc:name="HTTP Listener config">
+        <http:listener-connection host="0.0.0.0" port="8082" />
+    </http:listener-config>
+
+
+    <db:config name="Database_Config" doc:name="Database Config">
+        <db:my-sql-connection host="localhost" port="3306" user="root" password="password" database="inventoryDb" />
+    </db:config>
+
+    <http:listener-config name="HTTP_Listener_config2" doc:name="HTTP Listener config" doc:id="49d9be8c-deac-4c37-8997-510fb3cb4124" >
+		<http:listener-connection protocol="HTTPS" host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="inventoryFlow">
+        <http:listener config-ref="HTTP_Listener_config2" path="/inventory" allowedMethods="GET,POST,PUT" doc:name="HTTP Listener">
+            <http:response statusCode="200" />
+            <http:error-response statusCode="500" />
+        </http:listener>
+
+        <choice doc:name="Choice">
+
+            <when expression="#[attributes.method == 'GET']">
+                <db:select config-ref="Database_Config" doc:name="Retrieve inventory from DB">
+                    <db:sql>SELECT * FROM inventory</db:sql>
+                </db:select>
+                <set-payload value="#[output application/json --- payload]" doc:name="Set Payload to JSON" />
+            </when>
+
+       
+            <when expression="#[attributes.method == 'POST']">
+
+            </when>
+
+ 
+            <when expression="#[attributes.method == 'PUT']">
+    
+            </when>
+        </choice>
+
+
+        <error-handler>
+            <on-error-continue>
+                <set-payload value="{'error': 'An error occurred while processing the inventory!'}" doc:name="Set Error Payload" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+</mule>

@@ -1,0 +1,7 @@
+# Propriedades de produção
+db:
+  url: jdbc:mysql://prod-host:3306/proddb
+  user: produser
+  password: prodpass
+api:
+  port: 8080

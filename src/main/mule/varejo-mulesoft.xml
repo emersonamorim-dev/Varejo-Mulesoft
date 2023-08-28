@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="8e22740d-4090-44d2-9a2d-041eefdf83fa" >
+		<http:request-connection protocol="HTTPS" />
+	</http:request-config>
+	<http:listener-config name="Listener_config6" doc:name="HTTP Listener config" doc:id="1bf1b7b6-5a16-47d5-8e6f-f4e7d3efaebc" >
+		<http:listener-connection protocol="HTTPS" host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="varejo-mulesoftFlow" doc:id="fb8b8115-6529-463e-b577-2bb596a5adf7" >
+		<http:listener doc:name="Listener" doc:id="5ba0fc97-bd6b-410d-96f7-eb351344a068" config-ref="Listener_config6" path="payload"/>
+		<http:request method="GET" doc:name="Request" doc:id="adfe6f36-f2bb-4a6f-a411-c54168ed889a" config-ref="HTTP_Request_configuration" path="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="c9d2286b-7eac-4edb-94b7-a988b414bf62" />
+	</flow>
+</mule>

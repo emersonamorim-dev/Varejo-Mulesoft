@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+
+    <http:listener-config name="Listener5_config" doc:name="HTTP Listener config">
+        <http:listener-connection host="0.0.0.0" port="8083" />
+    </http:listener-config>
+
+    <http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config" doc:id="9a33968f-c66a-48d6-ba0e-6dd1d9d010d8" >
+		<http:listener-connection protocol="HTTPS" host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="mainFlow">
+        <http:listener config-ref="HTTP_Listener_config1" path="/welcome" doc:name="HTTP Listener">
+            <http:response statusCode="200" />
+            <http:error-response statusCode="500" />
+        </http:listener>
+
+
+        <set-payload value="{'message': 'Welcome to the main flow!'}" doc:name="Set Welcome Message" />
+
+
+        <error-handler>
+            <on-error-continue>
+                <set-payload value="{'error': 'An unexpected error occurred!'}" doc:name="Set Error Payload" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+</mule>

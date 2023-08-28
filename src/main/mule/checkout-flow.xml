@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <http:listener-config name="Listener2_config" doc:name="HTTP Listener config">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+
+
+    <db:config name="Database_Config" doc:name="Database Config">
+        <db:my-sql-connection host="localhost" port="3306" user="root" password="password" database="testDb" />
+    </db:config>
+
+    <http:listener-config name="HTTP_Listener_config4" doc:name="HTTP Listener config" doc:id="3f442e0c-f5a5-470e-b25d-909a7094e6ef" >
+		<http:listener-connection protocol="HTTPS" host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="customerFlow">
+        <http:listener config-ref="HTTP_Listener_config4" path="/customers" doc:name="HTTP Listener">
+            <http:response statusCode="200" />
+            <http:error-response statusCode="500" />
+        </http:listener>
+
+        <choice doc:name="Choice">
+
+            <when expression="#[attributes.method == 'GET']">
+                <db:select config-ref="Database_Config" doc:name="Retrieve customers from DB">
+                    <db:sql>SELECT * FROM customers</db:sql>
+                </db:select>
+                <set-payload value="#[output application/json --- payload]" doc:name="Set Payload to JSON" />
+            </when>
+
+   
+            <when expression="#[attributes.method == 'POST']">
+
+            </when>
+
+
+        </choice>
+
+
+        <error-handler>
+            <on-error-continue>
+                <set-payload value="{'error': 'An error occurred!'}" doc:name="Set Error Payload" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+</mule>
+

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+
+    <http:listener-config name="Listener3_config" doc:name="HTTP Listener config">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+
+    <http:listener-config name="HTTP_Listener_config3" doc:name="HTTP Listener config" doc:id="888f1498-65cb-4d41-8be2-30b1106b8646" >
+		<http:listener-connection protocol="HTTPS" host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="checkoutFlow">
+        <http:listener config-ref="HTTP_Listener_config3" path="/checkout" allowedMethods="POST" doc:name="HTTP Listener">
+            <http:response statusCode="200" />
+            <http:error-response statusCode="500" />
+        </http:listener>
+
+        
+        <set-variable variableName="checkoutData" value="#[payload]" doc:name="Store Checkout Data" />
+
+        
+        <vm:publish config-ref="VM_Config" queueName="checkoutQueue" doc:name="Publish to Checkout Queue">
+            <vm:content>#[vars.checkoutData]</vm:content>
+        </vm:publish>
+
+
+        <set-payload value="{'status': 'Checkout processed successfully!'}" doc:name="Set Success Response" />
+
+
+        <error-handler>
+            <on-error-continue>
+                <set-payload value="{'error': 'An error occurred during checkout!'}" doc:name="Set Error Payload" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+
+    <vm:config name="VM_Config" doc:name="VM Config" />
+</mule>
