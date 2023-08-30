@@ -1,4 +1,4 @@
-# Varejo Aplicação Mulesoft 
+# Varejo Aplicação Mulesoft  
 
 Codificação de aplicação de Varejo usando Java com Mulesoft foi desenvolvida para gerenciar os processos de varejo usei o banco de dados MySQL e para implementação de fluxos incluindo checkout, gestão de clientes, inventário e mais.
 
